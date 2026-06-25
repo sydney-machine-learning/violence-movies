@@ -1,4 +1,4 @@
-# YOLO-CNN-LSTM Model for Image Classification
+# Deep learning framework for video-based violence and abuse detection in movies
 ## Requirements
 To run the code in this repository, you need to have the following libraries installed:
 
@@ -127,3 +127,7 @@ Please refer to src\test_cnn_lstm_keras
 
 #### high-level violence
 <img src="images/The_Boys_S4_E2_(40.00-46.00)_sample_clip_2_00_32_to_01_05.gif" />
+
+### Preprint
+ 
+Rohitash Chandra, Jiaqian Li, Ying Dong, Henghao Zhuang, Dongming Wu; Deep learning framework for video-based violence and abuse detection in movies, Research Square: https://www.researchsquare.com/article/rs-10061173/v1
