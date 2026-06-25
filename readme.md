@@ -1,5 +1,5 @@
-# Deep learning framework for video-based violence and abuse detection in movies
-## Requirements
+## Deep learning framework for video-based violence and abuse detection in movies
+### Requirements
 To run the code in this repository, you need to have the following libraries installed:
 
 - Python 3.x
@@ -16,7 +16,7 @@ You can install the required packages using the following command:
 pip install tensorflow keras numpy matplotlib opencv-python-headless jupyter
 ```
 
-## Folder Structure
+### Folder Structure
 ```text
 VIOLENCE-MOVIES/
 ├── data/
