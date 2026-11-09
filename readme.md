@@ -26,9 +26,9 @@ violence-movies/
 
 ## 1. Project Objective and Content Overview
 
-This project helps reviewers locate and assess candidate scenes of visual violence in films and TV episodes. YOLOv8 selects candidate segments. A video classifier assigns each segment to non-violence, unarmed violence, or armed violence.
+This project uses deep learning and computer vision techniques to detect and remove violent and inappropriate content from movie videos. Unlike current common detection methods that only identify whether the violence is violent or not, the framework also categorizes the identified violence in terms of low and high levels in movies. It combines YOLO-v8 and 3D-CNN-LSTM models to detect and categorize violent content. YOLOv8 selects candidate segments. A video classifier (3D-CNN-LSTM) assigns each segment to non-violence, low (unarmed) violence, or high (armed) violence.
 
-The revised study compares 3D-CNN-LSTM with C3D, ConvLSTM, MViTv2-S, and MoViNet-A0-Base. On AIRTLab, the hybrid achieved **78.06% mean chunk accuracy** and **79.43% mean source-video accuracy** across ten grouped test folds. Film and TV examples illustrate the workflow in case studies.
+The study compares 5 different classifiers, namely 3D-CNN-LSTM, C3D, ConvLSTM, MViTv2-S, and MoViNet-A0. On AIRTLab, the 3D-CNN-LSTM achieved **78.06% mean chunk accuracy** and **79.43% mean source-video accuracy** across ten grouped test folds. Film and TV examples illustrate the workflow in case studies.
 
 <img src="images/Framework6.png" width="720"/>
 
