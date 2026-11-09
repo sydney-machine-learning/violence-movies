@@ -104,3 +104,7 @@ If you need to train a detector, save the [Ultralytics YOLOv8s starter weights](
 
 #### high-level violence
 <img src="images/The_Boys_S4_E2_(40.00-46.00)_sample_clip_2_00_32_to_01_05.gif" />
+
+### Preprint
+ 
+Rohitash Chandra, Jiaqian Li, Ying Dong, Henghao Zhuang, Dongming Wu; Deep learning framework for video-based violence and abuse detection in movies, Research Square: https://www.researchsquare.com/article/rs-10061173/v1
