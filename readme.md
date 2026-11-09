@@ -1,6 +1,6 @@
-# Violence detection in movie videos
+## Deep learning framework for video-based violence and abuse detection in movies
 
-## Requirements
+### Requirements
 
 Use Python 3.11 and install a matching `torch` and `torchvision` pair for your [CPU or CUDA environment](https://pytorch.org/get-started/locally/). Then install the notebook dependencies:
 
@@ -10,7 +10,7 @@ python -m pip install numpy scikit-learn h5py matplotlib pandas opencv-python ju
 
 For the YOLO notebooks, run `python -m pip install ultralytics roboflow` and put FFmpeg on `PATH` for clip export. Start JupyterLab from the project root with `python -m jupyterlab`.
 
-## Folder Structure
+### Folder Structure
 
 ```text
 violence-movies/
