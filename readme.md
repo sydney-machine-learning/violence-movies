@@ -1,65 +1,50 @@
-# YOLO-CNN-LSTM Model for Image Classification
+# Violence detection in movie videos
+
 ## Requirements
-To run the code in this repository, you need to have the following libraries installed:
 
-- Python 3.x
-- TensorFlow
-- Keras
-- NumPy
-- Matplotlib
-- OpenCV
-- Jupyter
-
-You can install the required packages using the following command:
+Use Python 3.11 and install a matching `torch` and `torchvision` pair for your [CPU or CUDA environment](https://pytorch.org/get-started/locally/). Then install the notebook dependencies:
 
 ```bash
-pip install tensorflow keras numpy matplotlib opencv-python-headless jupyter
+python -m pip install numpy scikit-learn h5py matplotlib pandas opencv-python jupyterlab
 ```
+
+For the YOLO notebooks, run `python -m pip install ultralytics roboflow` and put FFmpeg on `PATH` for clip export. Start JupyterLab from the project root with `python -m jupyterlab`.
 
 ## Folder Structure
-```text
-VIOLENCE-MOVIES/
-├── data/
-│   ├── processed/              # processed datasets
-│   │   └── violence-detection-dataset/
-│   ├── raw/                    # raw datasets
-│   │   ├── Real Life Violence Dataset/
-│   │   └── violence-detection-dataset/
-│   ├── roboflow/               # Roboflow YOLO dataset
-│   └── streaming videos/       # videos for real-world inference testing
-│       ├── filter_results/
-│       └── raw_samples/
-├── deprecated/                 # old experimental code
-├── images/                     # images used in README/report
-├── src/                        # main source code and notebooks
-│   └── preprocess/             # preprocessing scripts
-├── yolo_weight/                # YOLO model weights
-└── c3d_weight/                 # C3D model weights
-```
 
+```text
+violence-movies/
+├── notebooks/                   # preprocessing, training, and inference notebooks
+├── src/                         # model, training, and benchmark modules
+├── deprecated/src/              # legacy Keras notebooks
+├── data/                        # local datasets, prepared chunks, and video inputs
+├── c3d_weight/                  # pretrained Sports-1M weights (local)
+├── yolo_weight/                 # YOLO checkpoints (local)
+├── weights/                     # trained PyTorch classifiers (local)
+└── results/                     # generated reports (local)
+```
 
 ## 1. Project Objective and Content Overview
- 
-Title: Deep learning for violence and abuse detection in cinema and series: OTT streaming platforms
-Content: This project uses deep learning and computer vision techniques to detect and remove violent and inappropriate content from movie videos. Unlike current common detection methods that only identify whether the violence is violent or not, the framework also categorizes the identified violence in terms of lowand high levels  in movies. It combines YOLO and CNN-LSTM models to detect and categorize violent content with 70% accuracy. With the increased concern about violent content in Hollywood movies, the framework fills the current gap in content review for streaming platforms, reducing the reliance on manual content review and improving efficiency. Its scalability across different video types makes it a powerful tool for content management on digital platforms.
 
-<img src="images\Framework6.png" width="720"/>
+This project helps reviewers locate and assess candidate scenes of visual violence in films and TV episodes. YOLOv8 selects candidate segments. A video classifier assigns each segment to non-violence, unarmed violence, or armed violence.
 
-## 2.Dataset and Preprocessing
+The revised study compares 3D-CNN-LSTM with C3D, ConvLSTM, MViTv2-S, and MoViNet-A0-Base. On AIRTLab, the hybrid achieved **78.06% mean chunk accuracy** and **79.43% mean source-video accuracy** across ten grouped test folds. Film and TV examples illustrate the workflow in case studies.
+
+<img src="images/Framework6.png" width="720"/>
+
+## 2. Dataset and Preprocessing
 ### a) AIRTLab Dataset
-Dataset AIRTLab: https://github.com/airtlab/A-Dataset-for-Automatic-Violence-Detection-in-Videos
-Or we can use the following command line:
+
+From the repository root, download [AIRTLab](https://github.com/airtlab/A-Dataset-for-Automatic-Violence-Detection-in-Videos):
 
 ```bash
-# downloads the AIRTLAB dataset for violence detection
-!mkdir -p ../../data/raw
-!git clone https://github.com/airtlab/A-Dataset-for-Automatic-Violence-Detection-in-Videos.git ../../data/raw
+git clone https://github.com/airtlab/A-Dataset-for-Automatic-Violence-Detection-in-Videos.git data/raw/violence-detection-dataset
 ```
-We made a new organizing classification of the above dataset into nonviolent (including gesture, handshake, highfive, hug, jump, walk, and greet), low-violence (including push, slap, choking, stifle, kick, and punch), and high-violence (including shoot, stab, and club). Then, We divide each video into chunks with 16 frames at a resolution of 112 x 112 (e.g. a video may have 8 chunks) and store the samples and labels to data\processed\violence-detection-dataset. The code refers to src\preprocess\preprocess_AIRTLab.
+
+Run the [AIRTLab preprocessing notebook](notebooks/preprocess_AIRTLab.ipynb) to assign the corrected action labels and build 16-frame chunks at 112 × 112 pixels. The notebook samples every third source frame, uses 50% overlap, and saves chunks, labels, and source-video IDs under `data/processed/violence-detection-dataset/`.
 
 ### b) Roboflow Violence Detection Dataset
-Around 10 thousand images annotated by 4 classes of box bounding, including NonViolence, Violence, guns, knife.
-Roboflow Violence Detection Dataset: https://universe.roboflow.com/violence-detection-fbe46/violence-detection-nbx24
+Export version 3 of the [Roboflow Violence Detection Dataset](https://universe.roboflow.com/violence-detection-fbe46/violence-detection-nbx24) in YOLOv8 format. Extract the dataset so that `data.yaml` is at `data/roboflow/Violence-Detection-3/data.yaml`.
 
 Dataset Split:
 - Train Set 88% 13873 Images
@@ -72,53 +57,45 @@ Preprocessing:
 - Outputs per training example: 3
 - Flip: Horizontal
 
-We store the dataset to data\roboflow.
-
 ### c) Streaming videos
 Use streaming video clips from movies as the analysis source, including John Wick, The Boys, The Punisher, Game of Thrones, Ip Man, Mission: Impossible – Fallout. Please refer to data\streaming videos
 
 Link: https://drive.google.com/drive/folders/1ISmc3xwPOwAkuYoVuEcPwje267oRG9k2?usp=sharing
 
 ## 3. Training
-### 3dcnn-lstm training
-We used pretained weight from Sports-1M. Please refer to src\train_cnn_lstm_keras
 
-Link: https://github.com/aslucki/C3D_Sport1M_keras
+### Video classifier training
 
-Model Structure
+1. Run [preprocess_AIRTLab.ipynb](notebooks/preprocess_AIRTLab.ipynb) to prepare the training data.
+2. For C3D or 3D-CNN-LSTM, save the [pretrained Sports-1M C3D weights](https://drive.google.com/uc?id=1rlZ-xTkTMjgWKiQFUedRnHlDgQwx6yTm) as `c3d_weight/3dcnn_weights.h5`. MViTv2-S and MoViNet-A0-Base download their pretrained weights on first use.
+3. Open [train_cnn_lstm_pytorch.ipynb](notebooks/train_cnn_lstm_pytorch.ipynb), run the AIRTLab-only data cell, and set `MODEL_NAME` to `3dcnnlstm`, `c3dcnn`, `lstm`, `mvit_v2_s`, or `movinet_a0_base`. Run ten-fold cross-validation grouped by source video, then final training to save a checkpoint under `weights/`. Video-level predictions use the two-step aggregation rule.
+4. Run the independent efficiency benchmark to measure parameters, GMACs, latency, and peak GPU memory.
+
+**Model structure and comparison**
 
 <p align="center">
-  <img src="images\Model Architecture.png"  width="380"/>
-  <img src="images\video prediction.png"  width="380"/>
+  <img src="images/Model Architecture.png" alt="3D-CNN-LSTM model architecture" />
 </p>
 
+<img src="images/Model Comparison.png" alt="Classifier architecture comparison" />
 
-Model Comparison
+### YOLOv8 training
 
-<img src="images\Model Comparison.png"/>
+If you need to train a detector, save the [Ultralytics YOLOv8s starter weights](https://docs.ultralytics.com/models/yolov8/#supported-tasks-and-modes) as `yolo_weight/yolov8s.pt`. Run [train_yolo.ipynb](notebooks/train_yolo.ipynb) with the Roboflow export. Use the resulting `src/runs/detect/<run>/weights/best.pt` for inference.
 
-<!-- <img src="images\Average Validation Accuracy of Chunks and Videos Across Epochs.png" />
-<p align="center">
-    <img src="images/3dcnn-lstm-roc.png" width="360" />
-    <img src="images/3dcnn-lstm-valacc.png" width="360" />
-</p> -->
-
-### Yolov8 training
-Please refer to src\train_yolo
-<img src="images/Yolo_results.png" />
+<img src="images/Yolo_results.png" alt="YOLOv8 training results" />
 
 ## 4. Analysis
-We run yolo first to extract subvideos that contain violence frames from streaming video. The extracting logic is if we detect violence frame, then we keep that frame and the following 5 seconde frames as a subvideo, saving in data\streaming videos\filter_results. Please refer to src\test_yolo.
-Then we run 3dcnn-lstm model to analyse the classification result from previous subvideos. Please refer to src\test_cnn_lstm_keras.
+
+1. Open [test_yolo.ipynb](notebooks/test_yolo.ipynb). Set `VIDEO_INPUT` to your video or input folder and `WEIGHTS_PATH` to a detector checkpoint trained on the Roboflow violence classes, such as the `best.pt` from Section 3. Run the extraction section to save candidate clips under `data/streaming videos/filter_results/`.
+2. Open [test_cnn_lstm_pytorch.ipynb](notebooks/test_cnn_lstm_pytorch.ipynb). Set `VIDEO_PATH` to the extracted clips, select the classifier with `MODEL_NAME`, and point `CHECKPOINT_PATH` to its matching `.pt` file under `weights/`. Run inference to classify the clips and summarize predicted violence durations.
 
 ### Yolo Detection analysis
-Please refer to src\test_yolo
 
 <img src="images/Misson_ Impossible - Fallout_sample_clip_4_01_47_to_02_03.gif" />
 <img src="images/Misson_ Impossible - Fallout_sample_clip_6_02_38_to_04_17.gif" />
 
 ### Streaming videos analysis
-Please refer to src\test_cnn_lstm_keras
 #### Non-violence
 <img src="images/Game_of_Thrones_S1_E8_(3.00-6.00_29.00-32.00)_sample_clip_5_03_20_to_03_28.gif" />
 
